@@ -17,7 +17,7 @@ runtime 拥有控制权
 在after agent 后才能获得真正的返回消息
 主要作用是进行监控，查看运行过程中可能出现的问题
 """
-@tool
+@tool(description="Get the weather")
 def get_weather():
     return "Sunny"
 @before_agent
@@ -112,9 +112,6 @@ def my_wrap_tool_call(request, handler):
     print("wrap_tool_call", f"退出 —— 工具返回 {str(result.content)[:30]}")
     return result
 
-
-
-
 agent = create_agent(
     model=ChatDeepSeek(model="deepseek-chat", temperature=0.9),
     middleware=[my_before_agent, my_after_agent, my_before_model,
@@ -123,88 +120,57 @@ agent = create_agent(
 res=agent.invoke({"messages": [{"role": "user", "content": "Hello, how are you?"}]})
 print(res)
 """
-{
-  "state": {
+[
+  {
+    "stage": "before_agent",
+    "runtime": {
+      "checkpoint_ns": "my_before_agent.before_agent",
+      "task_id": "2319f704-6894-ed76-d896-41009ce0372e",
+      "node_attempt": 1,
+      "node_first_attempt_time": 1794968880.9259467,
+      "context": null,
+      "store": null
+    },
     "messages": [
-      {
-        "type": "HumanMessage",
-        "content": "Hello, how are you?",
-        "additional_kwargs": {},
-        "response_metadata": {},
-        "id": "52a695c1-3389-4be0-836c-8753cd13d24c"
-      }
+      { "type": "HumanMessage", "content": "Hello, how are you?" }
     ]
   },
-  "runtime": {
-    "context": null,
-    "store": null,
-    "stream_writer": "<function Pregel.stream.<locals>.stream_writer at 0x0000021F1CFE67A0>",
-    "heartbeat": "<function _no_op_heartbeat at 0x0000021F1AD454E0>",
-    "previous": null,
-    "execution_info": {
-      "checkpoint_id": "1f1e1ba9-76bd-6ca8-8000-84d362e871b9",
-      "checkpoint_ns": "my_before_agent.before_agent:a8436fe9-c898-d621-cf90-cb78ef8e1348",
-      "task_id": "a8436fe9-c898-d621-cf90-cb78ef8e1348",
-      "thread_id": null,
-      "run_id": null,
+  {
+    "stage": "before_model",
+    "runtime": {
+      "checkpoint_ns": "my_before_model.before_model",
+      "task_id": "88dc16a0-0ab5-7f5a-dc66-e19703c4147c",
       "node_attempt": 1,
-      "node_first_attempt_time": 1794832694.5792606
+      "node_first_attempt_time": 1794968880.9265897,
+      "context": null,
+      "store": null
     },
-    "server_info": null,
-    "control": "<langgraph.runtime.RunControl object at 0x0000021F1CDBAB00>"
-  },
-  "output": {
     "messages": [
-      {
-        "type": "HumanMessage",
-        "content": "Hello, how are you?",
-        "additional_kwargs": {},
-        "response_metadata": {},
-        "id": "52a695c1-3389-4be0-836c-8753cd13d24c"
-      },
+      { "type": "HumanMessage", "content": "Hello, how are you?" }
+    ]
+  },
+  { "event": "wrap_model_call 进入 —— 包住模型调用" },
+  { "event": "wrap_model_call 退出 —— 模型已返回" },
+  {
+    "stage": "after_model",
+    "runtime": {
+      "checkpoint_ns": "my_after_model.after_model",
+      "task_id": "a34ba55b-895a-a679-0f65-9362e85369ac",
+      "node_attempt": 1,
+      "node_first_attempt_time": 1794968883.2960064,
+      "context": null,
+      "store": null
+    },
+    "messages": [
+      { "type": "HumanMessage", "content": "Hello, how are you?" },
       {
         "type": "AIMessage",
-        "content": "Hello! I'm doing well, thank you for asking. 😊 I'm ready to help you with whatever you need—whether it's answering questions, brainstorming ideas, writing, coding, or just having a chat.\n\nHow are you doing today? Is there something I can help you with?",
-        "additional_kwargs": {
-          "refusal": null
-        },
-        "response_metadata": {
-          "token_usage": {
-            "completion_tokens": 59,
-            "prompt_tokens": 10,
-            "total_tokens": 69,
-            "completion_tokens_details": null,
-            "prompt_tokens_details": {
-              "audio_tokens": null,
-              "cache_write_tokens": null,
-              "cached_tokens": 0,
-              "image_tokens": null,
-              "text_tokens": null
-            },
-            "prompt_cache_hit_tokens": 0,
-            "prompt_cache_miss_tokens": 10
-          },
-          "model_provider": "deepseek",
-          "model_name": "deepseek-flash",
-          "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
-          "id": "9d32a21e-268d-4567-9ba8-5c2aed2787d9",
-          "finish_reason": "stop",
-          "logprobs": null
-        },
-        "id": "lc_run--01a1e45d-7d34-7271-8868-e4691ff49390-0",
-        "tool_calls": [],
-        "invalid_tool_calls": [],
-        "usage_metadata": {
-          "input_tokens": 10,
-          "output_tokens": 59,
-          "total_tokens": 69,
-          "input_token_details": {
-            "cache_read": 0
-          },
-          "output_token_details": {}
-        }
+        "content": "Hello! I'm doing well, thank you for asking. 😊 I'm ready to help you with whatever you need—whether it's answering questions, brainstorming ideas, writing, coding, or just having a chat. How are you doing today?",
+        "model": "deepseek-flash",
+        "finish_reason": "stop",
+        "tokens": { "input": 10, "output": 50, "total": 60 }
       }
     ]
   }
-}
+]
 """
